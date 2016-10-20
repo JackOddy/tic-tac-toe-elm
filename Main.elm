@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Array exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -13,7 +12,7 @@ import Html.App as App
 type alias Model =
     { turn : Player
     , result : Maybe Player
-    , game : Array Array Maybe Play
+    , game : List (List Maybe Play)
     }
 
 
@@ -31,12 +30,12 @@ type Player
     | P2
 
 
-initRow : Array Maybe Play
+initRow : List (Maybe Play)
 initRow =
     [ Nothing, Nothing, Nothing ]
 
 
-initGame : Array Array Maybe Play
+initGame : List (List (Maybe Play))
 initGame =
     [ initRow, initRow, initRow ]
 
@@ -75,7 +74,20 @@ view model =
         ]
 
 
-gameBoard : Array Array Maybe Play -> Html Msg
+gameBoard : List (List Maybe Play) -> Html Msg
 gameBoard game =
-    div [] map ( row -> displayRow row ) game
+    div [] <| List.indexedMap (\rowNum -> (\row -> tr [] [ gameRow rowNum row ])) game
 
+
+renderCell : Int -> Int -> Maybe Play -> Html Msg
+renderCell row column status =
+    td [ onClick <| Turn row column ]
+
+
+gameRow : Int -> List Maybe Play -> Html Msg
+gameRow rowNum row =
+    let
+        cells =
+            List.indexedMap renderCell row
+    in
+        td [] cells
